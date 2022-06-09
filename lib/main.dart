@@ -1,11 +1,14 @@
-import 'package:bytebank/screens/contacts_list.dart';
 import 'package:flutter/material.dart';
 
-import 'screens/contact_form.dart';
+import 'database/app_database.dart';
+import 'models/contact.dart';
 import 'screens/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
+  save(Contact(0, 'Gusatavo', 1597)).then((id){
+    findAll().then((contacts) => debugPrint(contacts.toString()));
+  });
 }
 
 class MyApp extends StatelessWidget {
