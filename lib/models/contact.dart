@@ -5,8 +5,8 @@ class Contact {
 
   Contact(
       this.id,
-    this.name,
-    this.accountNumber,
+      this.name,
+      this.accountNumber,
   );
 
   @override
