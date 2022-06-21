@@ -55,40 +55,6 @@ class Dashboard extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Material(
-              color: Colors.indigo,
-              child: InkWell(
-                onTap: (){Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ContactsList(),
-                  ));
-                },
-                child: Ink(
-                  padding: const EdgeInsets.all(8.0),
-                  height: 100,
-                  width: 150,
-                  color: Colors.indigo,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
-                      Icon(
-                        Icons.help,
-                        color: Colors.white,
-                        size: 35.0,
-                      ),
-                      Text('Informações',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                          ))
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          )
         ],
       ),
     );
