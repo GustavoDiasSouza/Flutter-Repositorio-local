@@ -19,11 +19,11 @@ class _ContactsListState extends State<ContactsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contatos'),
+        title: const Text('Transferências'),
       ),
       body: FutureBuilder<List<Contact>>(
         initialData: const [],
-        future: Future.delayed(const Duration(seconds: 1))
+        future: Future.delayed(const Duration(seconds: 0))
             .then((value) => _dao.findAll()),
         //Pode Remover o Delay, esta mais a fim de teste.
         builder: (context, snapshot) {
