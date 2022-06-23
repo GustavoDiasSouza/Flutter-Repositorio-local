@@ -1,9 +1,11 @@
+import 'package:bytebank/http/webclient.dart';
 import 'package:flutter/material.dart';
 
 import 'screens/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
+  findAlL().then( (transactions) => print('new transctions $transactions '));
 }
 
 class MyApp extends StatelessWidget {
