@@ -1,6 +1,7 @@
 import 'package:bytebank/components/pregress.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/screens/contact_form.dart';
+import 'package:bytebank/screens/transaction_form.dart';
 import 'package:flutter/material.dart';
 
 import '../database/dao/contact_dao.dart';
@@ -13,7 +14,6 @@ class ContactsList extends StatefulWidget {
 }
 
 class _ContactsListState extends State<ContactsList> {
-
   final ContactDao _dao = ContactDao();
 
   @override
@@ -37,11 +37,18 @@ class _ContactsListState extends State<ContactsList> {
               break;
             case ConnectionState.done:
               final List<Contact> contacts = snapshot.data
-              as List<Contact>; //Melhorado com o as List<Contact>.
+                  as List<Contact>; //Melhorado com o as List<Contact>.
               return ListView.builder(
                 itemBuilder: (context, index) {
                   final contact = contacts[index];
-                  return _ContactItem(contact);
+                  return _ContactItem(
+                    contact,
+                    onclick: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => TransactionForm(contact),
+                      ));
+                    },
+                  );
                 },
                 itemCount: contacts.length,
               );
@@ -52,11 +59,13 @@ class _ContactsListState extends State<ContactsList> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const ContactForm(),
-            ),
-          ).then((value) => setState(() {}));
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => const ContactForm(),
+                ),
+              )
+              .then((value) => setState(() {}));
         },
         child: const Icon(
           Icons.add,
@@ -68,14 +77,19 @@ class _ContactsListState extends State<ContactsList> {
 
 class _ContactItem extends StatelessWidget {
   final Contact contact;
+  final Function onclick;
 
-  const _ContactItem(this.contact);
+  const _ContactItem(
+    this.contact, {
+    required this.onclick,
+  });
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Card(
       child: ListTile(
+        onTap: () => onclick(),
         title: Text(
           contact.name,
           style: const TextStyle(
