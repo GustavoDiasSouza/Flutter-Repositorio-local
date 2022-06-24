@@ -34,18 +34,21 @@ class TransactionsList extends StatelessWidget {
                       final Transaction transaction = transactions[index];
                       return Card(
                         child: ListTile(
-                          leading: const Icon(Icons.monetization_on),
+                          leading: const Icon(
+                            Icons.monetization_on,
+                            color: Colors.blue,
+                          ),
                           title: Text(
                             transaction.value.toString(),
                             style: const TextStyle(
-                              fontSize: 24.0,
+                              fontSize: 22.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           subtitle: Text(
                             transaction.contact.accountNumber.toString(),
                             style: const TextStyle(
-                              fontSize: 16.0,
+                              fontSize: 15.0,
                             ),
                           ),
                         ),
