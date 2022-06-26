@@ -7,9 +7,7 @@ import 'package:http/http.dart';
 class TransactionwebClient {
 //Precisa estar na mesma rede
   Future<List<Transaction>> findAlL() async {
-    final Response response = await client
-        .get(Uri.parse(baseUrl))
-        .timeout(const Duration(seconds: 15));
+    final Response response = await client.get(Uri.parse(baseUrl));
 
     final List<dynamic> decodedJson = jsonDecode(response.body);
 
@@ -18,7 +16,7 @@ class TransactionwebClient {
         .toList();
   }
 
-  Future<Transaction> save(Transaction transaction, String password) async {
+  Future<Transaction?> save(Transaction transaction, String password) async {
     final String transactionJson = jsonEncode(transaction.toJson());
 
     final Response response = await client.post(Uri.parse(baseUrl),
@@ -28,12 +26,22 @@ class TransactionwebClient {
         },
         body: transactionJson);
 
-    if (response.statusCode == 400) {
-      throw Exception('Ocorreu um erro no envio da transferência!');
-    } else if (response.statusCode == 401) {
-      throw Exception('Falha na autenticação!');
+    if (response.statusCode == 200) {
+      return Transaction.fromJson(jsonDecode(response.body));
     }
 
-    return Transaction.fromJson(jsonDecode(response.body));
+    throw HttpException(_statusCodeResponses[response.statusCode]);
   }
+
+  //Verifica qual foi o erro
+  static final Map<int, String> _statusCodeResponses = {
+    400: 'Ocorreu um erro no envio da transferência!',
+    401: 'Falha na autenticação!',
+  };
+}
+
+class HttpException implements Exception {
+  final String? message;
+
+  HttpException(this.message);
 }

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:bytebank/components/response_dialog.dart';
 import 'package:bytebank/components/transaction_auth_dialog.dart';
 import 'package:bytebank/http/webclients/transaction_webclient.dart';
 import 'package:bytebank/models/contact.dart';
@@ -23,65 +26,59 @@ class _TransactionFormState extends State<TransactionForm> {
       appBar: AppBar(
         title: const Text('Nova Transação'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                widget.contact.name,
-                style: const TextStyle(
-                  fontSize: 24.0,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Text(
-                  widget.contact.accountNumber.toString(),
-                  style: const TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: TextField(
-                  controller: _valueController,
-                  style: const TextStyle(fontSize: 24.0),
-                  decoration: const InputDecoration(labelText: 'Value'),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: SizedBox(
-                  width: double.maxFinite,
-                  child: ElevatedButton(
-                    child: const Text('Transferir'),
-                    onPressed: () {
-                      final double? value =
-                          double.tryParse(_valueController.text);
-                      final transactionCreated =
-                          Transaction(value!, widget.contact);
-                      showDialog(
-                          context: context,
-                          builder: (contextDialog) {
-                            return TransactionAuthDialog(
-                              onConfirm: (String password) {
-                                _save(transactionCreated, password, context);
-                              },
-                            );
-                          });
-                    },
-                  ),
-                ),
-              )
-            ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            widget.contact.name,
+            style: const TextStyle(
+              fontSize: 24.0,
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Text(
+              widget.contact.accountNumber.toString(),
+              style: const TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: TextField(
+              controller: _valueController,
+              style: const TextStyle(fontSize: 24.0),
+              decoration: const InputDecoration(labelText: 'Value'),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: SizedBox(
+              width: double.maxFinite,
+              child: ElevatedButton(
+                child: const Text('Transferir'),
+                onPressed: () {
+                  final double? value = double.tryParse(_valueController.text);
+                  final transactionCreated =
+                      Transaction(value!, widget.contact);
+                  showDialog(
+                      context: context,
+                      builder: (contextDialog) {
+                        return TransactionAuthDialog(
+                          onConfirm: (String password) {
+                            _save(transactionCreated, password, context);
+                          },
+                        );
+                      });
+                },
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -90,18 +87,43 @@ class _TransactionFormState extends State<TransactionForm> {
     Transaction transactionCreated,
     String password,
     BuildContext context,
-  ) {
-    _webClient
-        .save(
-      transactionCreated,
-      password,
-    )
-        .then((transaction) {
-      if (transaction != null) {
-        Navigator.pop(context);
-      }
-    }).catchError((e) {
-      print(e);
+  ) async {
+    Transaction? transaction =
+        await _send(transactionCreated, password, context);
+
+    _showSucessFulMessage(transaction, context);
+  }
+
+  Future<void> _showSucessFulMessage(
+      Transaction? transaction, BuildContext context) async {
+    if (transaction != null) {
+      await showDialog(
+          context: context,
+          builder: (contextDialog) {
+            return SuccessDialog('Sucesso');
+          }).then((value) => Navigator.pop(context));
+    }
+  }
+
+  Future<Transaction?> _send(Transaction transactionCreated, String password,
+      BuildContext context) async {
+    final Transaction? transaction =
+        await _webClient.save(transactionCreated, password).catchError((e) {
+      _showFailereMessage(context, message: e.message);
+    }, test: (e) => e is TimeoutException).catchError((e) {
+      _showFailereMessage(context, message: 'Tempo Esgotado!');
+    }, test: (e) => e is HttpException).catchError((e) {
+      _showFailereMessage(context);
     });
+    return transaction;
+  }
+
+  void _showFailereMessage(BuildContext context,
+      {String message = 'Erro inesperado!'}) {
+    showDialog(
+        context: context,
+        builder: (contextDialog) {
+          return FailureDialog(message);
+        });
   }
 }

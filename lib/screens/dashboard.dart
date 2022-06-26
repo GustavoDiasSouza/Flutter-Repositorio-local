@@ -1,3 +1,4 @@
+
 import 'package:bytebank/screens/contacts_list.dart';
 import 'package:bytebank/screens/transactions_list.dart';
 import 'package:flutter/material.dart';
@@ -19,21 +20,21 @@ class Dashboard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Image.asset('images/bytebank_logo.png'),
           ),
-          SingleChildScrollView( //Criado para Adaptar aos tamanhos de tela / Pode ser utilizado um container com um listview
+          SingleChildScrollView(
+            //Criado para Adaptar aos tamanhos de tela / Pode ser utilizado um container com um listview
             scrollDirection: Axis.horizontal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children:  [
+              children: [
                 _FeatureItem(
                   "Transferências",
                   Icons.monetization_on,
-                  onClick:() => _showContactsList(context),
+                  onClick: () => _showContactsList(context),
                 ),
                 _FeatureItem(
                   "Histórico",
                   Icons.description,
-                  onClick: () =>
-                    _showTransactionsList(context),
+                  onClick: () => _showTransactionsList(context),
                 ),
                 _FeatureItem(
                   "Perfil",
@@ -50,7 +51,7 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  _showContactsList(BuildContext context){
+  _showContactsList(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => const ContactsList(),
     ));
@@ -61,17 +62,14 @@ class Dashboard extends StatelessWidget {
       builder: (context) => TransactionsList(),
     ));
   }
-
-
 }
 
 class _FeatureItem extends StatelessWidget {
-
   final String name;
   final IconData icon;
   final Function onClick; //Callback
 
-  const _FeatureItem(this.name, this.icon,{required this.onClick});
+  const _FeatureItem(this.name, this.icon, {required this.onClick});
 
   @override
   Widget build(BuildContext context) {
