@@ -1,4 +1,4 @@
-import 'package:bytebank/components/pregress.dart';
+import 'package:bytebank/components/progress.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/screens/contact_form.dart';
 import 'package:bytebank/screens/transaction_form.dart';
