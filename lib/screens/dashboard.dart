@@ -1,5 +1,6 @@
 import 'package:bytebank/screens/contacts_list.dart';
 import 'package:bytebank/screens/transactions_list.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatelessWidget {
@@ -57,6 +58,8 @@ class Dashboard extends StatelessWidget {
   }
 
   _showTransactionsList(BuildContext context) {
+
+    FirebaseCrashlytics.instance.crash();
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => TransactionsList(),
     ));

@@ -1,5 +1,5 @@
-import 'dart:async';
 
+import 'dart:async';
 import 'package:bytebank/components/progress.dart';
 import 'package:bytebank/components/response_dialog.dart';
 import 'package:bytebank/components/transaction_auth_dialog.dart';
@@ -7,6 +7,7 @@ import 'package:bytebank/http/webclients/transaction_webclient.dart';
 import 'package:bytebank/models/contact.dart';
 import 'package:bytebank/models/transaction.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,9 +27,12 @@ class _TransactionFormState extends State<TransactionForm> {
 
   bool _sending = false;
 
+  final _scaffoldkey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldkey,
       appBar: AppBar(
         title: const Text('Nova Transação'),
       ),
@@ -132,37 +136,56 @@ class _TransactionFormState extends State<TransactionForm> {
       _sending = true;
     });
     final Transaction? transaction = await _webClient.save(transactionCreated, password).catchError((e) {
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.statusCode);
-      FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
-      FirebaseCrashlytics.instance.recordError(e.message, null);
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
+        FirebaseCrashlytics.instance.setCustomKey('StatusCode', e.statusCode);
+        FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e.message, null);
+      }
 
       _showFailereMessage(context, message: e.message);
     }, test: (e) => e is TimeoutException).catchError((e) {
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.statusCode);
-      FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
-      FirebaseCrashlytics.instance.recordError(e.message, null);
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
+        FirebaseCrashlytics.instance.setCustomKey('StatusCode', e.statusCode);
+        FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e.message, null);
+      }
 
       _showFailereMessage(context, message: 'Tempo Esgotado!');
     }, test: (e) => e is HttpException).catchError((e) {
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
-      FirebaseCrashlytics.instance.setCustomKey('Exception', e.statusCode);
-      FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
-      FirebaseCrashlytics.instance.recordError(e.message, null);
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('Exception', e.toString());
+        FirebaseCrashlytics.instance.setCustomKey('StatusCode', e.statusCode);
+        FirebaseCrashlytics.instance.setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e.message, null);
+      }
 
       _showFailereMessage(context);
     }).whenComplete(() {
-      _sending = false;
+      setState(() {
+        _sending = false;
+      });
     });
+
     return transaction;
   }
 
-  void _showFailereMessage(BuildContext context, {String message = 'Erro inesperado!'}) {
-    showDialog(
-        context: context,
-        builder: (contextDialog) {
-          return FailureDialog(message);
-        });
+  void _showFailereMessage(
+    BuildContext context, {
+    String message = 'Parece que algo deu errado!',
+  }) {
+    //SnackBar
+    final snackBar = SnackBar(content: Text(message));
+    _scaffoldkey.currentState!.showSnackBar(snackBar);
+
+
+    //Aviso Grande
+    //   showDialog(
+    //       context: context,
+    //       builder: (contextDialog) {
+    //         return FailureDialog(message);
+    //       });
+    // }
   }
 }
